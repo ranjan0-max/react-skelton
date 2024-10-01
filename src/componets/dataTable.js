@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import {
     Table,
@@ -15,11 +16,19 @@ import {
     InputAdornment,
     Stack,
     Button,
-    Tooltip
+    Tooltip,
+    // Checkbox,
+    // headCells,
+    TableSortLabel,
+    Box,
+    Toolbar,
+    IconButton
 } from '@mui/material';
+import { visuallyHidden } from '@mui/utils';
 
 // icon
 import SearchIcon from '@mui/icons-material/Search';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 // custom component
 import MainCard from 'componets/MainCard';
@@ -27,13 +36,115 @@ import MainCard from 'componets/MainCard';
 const EnhancedDataTable = ({ data, headers, tableTitle, addButton, actions }) => {
     const [rows, setRows] = useState(data);
     const [order, setOrder] = useState('asc');
-    const [orderBy, setOrderBy] = useState('jobNumber');
+    const [orderBy, setOrderBy] = useState(headers?.[0]?.id);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [search, setSearch] = useState('');
     const [searchKeys, setSearchKeys] = useState([]);
+    const [selected, setSelected] = React.useState([]);
 
-    // search=
+    // headers
+    function EnhancedTableHead({ onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, selected }) {
+        const createSortHandler = (property) => (event) => {
+            onRequestSort(event, property);
+        };
+
+        return (
+            <TableHead>
+                <TableRow>
+                    {/* <TableCell padding="checkbox" sx={{ pl: 3 }}>
+                        <Checkbox
+                            color="primary"
+                            indeterminate={numSelected > 0 && numSelected < rowCount}
+                            checked={rowCount > 0 && numSelected === rowCount}
+                            onChange={onSelectAllClick}
+                            inputProps={{
+                                'aria-label': 'select all desserts'
+                            }}
+                        />
+                    </TableCell> */}
+                    {numSelected > 0 && (
+                        <TableCell padding="none" colSpan={6}>
+                            <EnhancedTableToolbar numSelected={selected.length} />
+                        </TableCell>
+                    )}
+                    {numSelected <= 0 &&
+                        headers.map((headers) => (
+                            <TableCell
+                                key={headers.id}
+                                align={headers.align}
+                                padding={headers.disablePadding ? 'none' : 'normal'}
+                                sortDirection={orderBy === headers.id ? order : false}
+                            >
+                                <TableSortLabel
+                                    active={orderBy === headers.id}
+                                    direction={orderBy === headers.id ? order : 'asc'}
+                                    onClick={createSortHandler(headers.id)}
+                                    style={{ fontWeight: 'bolder' }}
+                                >
+                                    {headers.label}
+                                    {orderBy === headers.id ? (
+                                        <Box component="span" sx={visuallyHidden}>
+                                            {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                                        </Box>
+                                    ) : null}
+                                </TableSortLabel>
+                            </TableCell>
+                        ))}
+                    {numSelected <= 0 && (
+                        <TableCell sortDirection={false} align="center" sx={{ pr: 3, fontWeight: 'bolder' }}>
+                            Action
+                        </TableCell>
+                    )}
+                </TableRow>
+            </TableHead>
+        );
+    }
+
+    EnhancedTableHead.propTypes = {
+        selected: PropTypes.array,
+        numSelected: PropTypes.number.isRequired,
+        onRequestSort: PropTypes.func.isRequired,
+        onSelectAllClick: PropTypes.func.isRequired,
+        order: PropTypes.oneOf(['asc', 'desc']).isRequired,
+        orderBy: PropTypes.string.isRequired,
+        rowCount: PropTypes.number.isRequired
+    };
+
+    // ==============================|| TABLE HEADER TOOLBAR ||============================== //
+
+    const EnhancedTableToolbar = ({ numSelected }) => (
+        <Toolbar
+            sx={{
+                p: 0,
+                pl: 1,
+                pr: 1,
+                ...(numSelected > 0 && {
+                    color: (theme) => theme.palette.secondary.main
+                })
+            }}
+        >
+            {numSelected > 0 ? (
+                <Typography color="inherit" variant="h4">
+                    {numSelected} Selected
+                </Typography>
+            ) : (
+                <Typography variant="h6" id="tableTitle">
+                    Nutrition
+                </Typography>
+            )}
+            <Box sx={{ flexGrow: 1 }} />
+            {numSelected > 0 && (
+                <Tooltip title="Delete">
+                    <IconButton size="large">
+                        <DeleteIcon fontSize="small" />
+                    </IconButton>
+                </Tooltip>
+            )}
+        </Toolbar>
+    );
+
+    // search
     const handleSearch = (event) => {
         const newString = event?.target.value;
         setSearch(newString || '');
@@ -101,6 +212,41 @@ const EnhancedDataTable = ({ data, headers, tableTitle, addButton, actions }) =>
         setPage(0);
     };
 
+    // select
+
+    // const handleClick = (event, name) => {
+    //     console.log(selected);
+    //     const selectedIndex = selected.indexOf(name);
+    //     let newSelected = [];
+
+    //     if (selectedIndex === -1) {
+    //         newSelected = newSelected.concat(selected, name);
+    //     } else if (selectedIndex === 0) {
+    //         newSelected = newSelected.concat(selected.slice(1));
+    //     } else if (selectedIndex === selected.length - 1) {
+    //         newSelected = newSelected.concat(selected.slice(0, -1));
+    //     } else if (selectedIndex > 0) {
+    //         newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
+    //     }
+
+    //     setSelected(newSelected);
+    // };
+
+    const handleSelectAllClick = (event) => {
+        if (event.target.checked) {
+            if (selected.length > 0) {
+                setSelected([]);
+            } else {
+                const newSelectedId = rows.map((n) => n._id);
+                setSelected(newSelectedId);
+            }
+            return;
+        }
+        setSelected([]);
+    };
+
+    // const isSelected = (name) => selected.indexOf(name) !== -1;
+
     React.useEffect(() => {
         const searchKeys = headers.map((head) => head.id);
         setSearchKeys(searchKeys);
@@ -108,8 +254,9 @@ const EnhancedDataTable = ({ data, headers, tableTitle, addButton, actions }) =>
 
     return (
         <MainCard
+            border={true}
             title={
-                <Typography variant="h5" color="primary">
+                <Typography variant="h5" color="primary" style={{ fontWeight: 'bolder' }}>
                     {tableTitle}
                 </Typography>
             }
@@ -135,7 +282,7 @@ const EnhancedDataTable = ({ data, headers, tableTitle, addButton, actions }) =>
                                 )
                             }}
                             onChange={handleSearch}
-                            placeholder="Search Job"
+                            placeholder="Search"
                             value={search}
                             size="small"
                         />
@@ -144,35 +291,15 @@ const EnhancedDataTable = ({ data, headers, tableTitle, addButton, actions }) =>
             </CardContent>
             <TableContainer component={Paper} sx={{ maxHeight: 700 }}>
                 <Table stickyHeader sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
-                    <TableHead>
-                        <TableRow>
-                            {headers.map((header) => (
-                                <TableCell key={header.id} align={header.align}>
-                                    <Typography
-                                        variant="subtitle"
-                                        onClick={(event) => handleRequestSort(event, header.id)}
-                                        align="center"
-                                        style={{ cursor: 'pointer', fontWeight: 'bolder', textTransform: 'uppercase' }}
-                                    >
-                                        {header.label}
-                                    </Typography>
-                                </TableCell>
-                            ))}
-                            {actions.length ? (
-                                <TableCell align="center">
-                                    <Typography
-                                        variant="subtitle"
-                                        align="center"
-                                        style={{ cursor: 'pointer', fontWeight: 'bolder', textTransform: 'uppercase' }}
-                                    >
-                                        Actions
-                                    </Typography>
-                                </TableCell>
-                            ) : (
-                                ''
-                            )}
-                        </TableRow>
-                    </TableHead>
+                    <EnhancedTableHead
+                        numSelected={selected.length}
+                        order={order}
+                        orderBy={orderBy}
+                        onSelectAllClick={handleSelectAllClick}
+                        onRequestSort={handleRequestSort}
+                        rowCount={rows.length}
+                        selected={selected}
+                    />
                     <TableBody>
                         {rows.length === 0 ? (
                             <TableRow>
@@ -183,27 +310,48 @@ const EnhancedDataTable = ({ data, headers, tableTitle, addButton, actions }) =>
                         ) : (
                             stableSort(rows, getComparator(order, orderBy))
                                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                .map((row, index) => (
-                                    <TableRow hover role="checkbox" tabIndex={-1} key={index}>
-                                        {headers.map((header) => (
-                                            <TableCell key={header.id} align={header.align}>
-                                                <Typography variant="subtitle1" color={header.id === 'jobNumber' ? 'secondary' : 'inherit'}>
-                                                    {row[header.id]}
-                                                </Typography>
+                                .map((row, index) => {
+                                    // const isItemSelected = isSelected(row?._id);
+                                    // const labelId = `enhanced-table-checkbox-${index}`;
+                                    return (
+                                        <TableRow hover role="checkbox" tabIndex={-1} key={index}>
+                                            {/* <TableCell
+                                                padding="checkbox"
+                                                sx={{ pl: 3, padding: '3px' }}
+                                                onClick={(event) => handleClick(event, row._id)}
+                                                align="center"
+                                            >
+                                                <Checkbox
+                                                    color="primary"
+                                                    checked={isItemSelected}
+                                                    inputProps={{
+                                                        'aria-labelledby': labelId
+                                                    }}
+                                                />
+                                            </TableCell> */}
+                                            {headers.map((header) => (
+                                                <TableCell key={header.id} align={header.align} sx={{ padding: '4px' }}>
+                                                    <Typography
+                                                        variant="subtitle1"
+                                                        color={header.id === 'jobNumber' ? 'secondary' : 'inherit'}
+                                                    >
+                                                        {row[header.id]}
+                                                    </Typography>
+                                                </TableCell>
+                                            ))}
+                                            <TableCell align="center" sx={{ padding: '4px' }}>
+                                                {actions &&
+                                                    actions.map((action, index) => (
+                                                        <Tooltip key={index} title={action.title}>
+                                                            <Button key={index} onClick={() => action.handler(row)}>
+                                                                {action.icon}
+                                                            </Button>
+                                                        </Tooltip>
+                                                    ))}
                                             </TableCell>
-                                        ))}
-                                        <TableCell align="center">
-                                            {actions &&
-                                                actions.map((action, index) => (
-                                                    <Tooltip key={index} title={action.title}>
-                                                        <Button key={index} onClick={() => action.handler(row)}>
-                                                            {action.icon}
-                                                        </Button>
-                                                    </Tooltip>
-                                                ))}
-                                        </TableCell>
-                                    </TableRow>
-                                ))
+                                        </TableRow>
+                                    );
+                                })
                         )}
                     </TableBody>
                 </Table>
