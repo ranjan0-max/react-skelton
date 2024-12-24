@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import {
     Box,
     Drawer,
@@ -18,20 +18,36 @@ import {
     IconButton
 } from '@mui/material';
 
-// icon
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
+// icons
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import DescriptionIcon from '@mui/icons-material/Description';
 import { IconSettings } from '@tabler/icons-react';
+import WebhookIcon from '@mui/icons-material/Webhook';
 
-// user context
+// custom hook
 import useAuth from 'customHook/useAuth';
 
-const drawerWidth = 240;
-const ITEM_HEIGHT = 48;
+const drawerWidth = 200;
+const ITEM_HEIGHT = 30;
 
 export default function PermanentDrawerLeft() {
     const { logOut } = useAuth();
+    const navigate = useNavigate();
+
     const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+
+    const menuList = [
+        {
+            label: 'Receipt',
+            icon: <ReceiptLongIcon />,
+            to: '/receipt'
+        },
+        {
+            label: 'Bill',
+            icon: <DescriptionIcon />,
+            to: '/invoice'
+        }
+    ];
 
     const handleSetting = (event) => {
         setMenuAnchorEl(event.currentTarget);
@@ -44,15 +60,20 @@ export default function PermanentDrawerLeft() {
     const handleLogOut = async () => {
         await logOut();
     };
+
+    const handleMenuItemClick = (path) => {
+        navigate(path);
+    };
+
     return (
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
-            <AppBar position="fixed" sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}>
+            <AppBar position="fixed" sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px`, backgroundColor: '#2878b6' }}>
                 <Toolbar>
-                    <Typography variant="h6" noWrap component="div">
-                        Permanent drawer
+                    <Typography variant="h6" noWrap component="div" style={{ fontWeight: 'bolder' }}>
+                        Fauji Ration Store
                     </Typography>
-                    <Box sx={{ flexGrow: 1 }} /> {/* This will create the space */}
+                    <Box sx={{ flexGrow: 2 }} /> {/* This will create the space */}
                     <IconButton
                         aria-label="more"
                         id="long-button"
@@ -100,33 +121,33 @@ export default function PermanentDrawerLeft() {
                 variant="permanent"
                 anchor="left"
             >
-                <Toolbar />
+                <Toolbar style={{ paddingRight: '5px' }}>
+                    <WebhookIcon />
+                    <Typography style={{ fontWeight: 'bolder', marginLeft: '2px' }}>Billing & Invoice</Typography>
+                </Toolbar>
                 <Divider />
                 <List>
-                    {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                        <ListItem key={text} disablePadding>
-                            <ListItemButton>
-                                <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                                <ListItemText primary={text} />
-                            </ListItemButton>
-                        </ListItem>
-                    ))}
-                </List>
-                <Divider />
-                <List>
-                    {['All mail', 'Trash', 'Spam'].map((text, index) => (
-                        <ListItem key={text} disablePadding>
-                            <ListItemButton>
-                                <ListItemIcon>{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}</ListItemIcon>
-                                <ListItemText primary={text} />
+                    {menuList.map((menu) => (
+                        <ListItem key={menu.label} disablePadding>
+                            <ListItemButton onClick={() => handleMenuItemClick(menu.to)}>
+                                <ListItemIcon>{menu.icon}</ListItemIcon>
+                                <ListItemText primary={menu.label} primaryTypographyProps={{ fontWeight: 'bold' }} />
                             </ListItemButton>
                         </ListItem>
                     ))}
                 </List>
             </Drawer>
-            <Box component="main" sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}>
+            <Box
+                component="main"
+                sx={{
+                    flexGrow: 1,
+                    bgcolor: 'background.default',
+                    p: 3,
+                    overflowY: 'auto' // Ensure main content area scrolls if needed
+                }}
+            >
                 <Toolbar />
-                <Outlet />
+                <Outlet /> {/* Render your routed components */}
             </Box>
         </Box>
     );

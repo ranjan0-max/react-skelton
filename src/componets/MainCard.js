@@ -37,8 +37,8 @@ const MainCard = React.forwardRef(
                 ref={ref}
                 {...others}
                 sx={{
-                    border: border ? '1px solid black' : 'none',
-                    borderColor: 'black',
+                    border: border ? '1px solid' : 'none',
+                    borderColor: theme.palette.mode === 'dark' ? theme.palette.background.default : theme.palette.grey[300] + 98,
                     ':hover': {
                         boxShadow: boxShadow
                             ? shadow ||

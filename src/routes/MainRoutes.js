@@ -5,7 +5,8 @@ import Loadable from '../componets/Loadable';
 import AuthGuard from '../guard/authGuard';
 import MenuLayout from '../menu';
 
-const DashboardDefault = Loadable(lazy(() => import('../view/dashboard')));
+const RecipeDefault = Loadable(lazy(() => import('../view/receipt')));
+const Invoice = Loadable(lazy(() => import('../view/invoice')));
 
 const MainRoutes = {
     path: '/',
@@ -17,7 +18,15 @@ const MainRoutes = {
     children: [
         {
             path: '/home',
-            element: <DashboardDefault /> // SUPER ADMIN
+            element: <RecipeDefault />
+        },
+        {
+            path: '/receipt',
+            element: <RecipeDefault />
+        },
+        {
+            path: '/invoice',
+            element: <Invoice />
         }
     ]
 };
