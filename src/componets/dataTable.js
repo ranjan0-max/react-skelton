@@ -1,39 +1,39 @@
-import PropTypes from 'prop-types';
-import React, { useState } from 'react';
 import {
+    Box,
+    Button,
+    CardContent,
+    Grid,
+    IconButton,
+    InputAdornment,
+    Paper,
+    Stack,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
-    TableRow,
     TablePagination,
-    Typography,
-    Paper,
-    CardContent,
-    Grid,
-    TextField,
-    InputAdornment,
-    Stack,
-    Button,
-    Tooltip,
+    TableRow,
     // Checkbox,
     // headCells,
     TableSortLabel,
-    Box,
+    TextField,
     Toolbar,
-    IconButton
+    Tooltip,
+    Typography
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils';
+import PropTypes from 'prop-types';
+import React, { useState } from 'react';
 
 // icon
-import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SearchIcon from '@mui/icons-material/Search';
 
 // custom component
-import MainCard from 'componets/MainCard';
+import MainCard from './cards/MainCard';
 
-const EnhancedDataTable = ({ data, headers, tableTitle, addButton, actions }) => {
+const CustomDataTable = ({ data, headers, tableTitle, addButton, actions }) => {
     const [rows, setRows] = useState(data);
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState(headers?.[0]?.id);
@@ -254,43 +254,90 @@ const EnhancedDataTable = ({ data, headers, tableTitle, addButton, actions }) =>
 
     return (
         <MainCard
-            border={true}
+            border
+            sx={{
+                borderRadius: 3,
+                boxShadow: 4,
+                overflow: 'hidden',
+                backgroundColor: '#fdfdfd'
+            }}
             title={
-                <Typography variant="h5" color="primary" style={{ fontWeight: 'bolder' }}>
+                <Typography
+                    variant="h5"
+                    sx={{
+                        fontWeight: 'bold',
+                        letterSpacing: '0.75px',
+                        textTransform: 'capitalize',
+                        background: 'linear-gradient(to right, #4facfe, #00f2fe)',
+                        WebkitBackgroundClip: 'text',
+                        color: 'transparent'
+                    }}
+                >
                     {tableTitle}
                 </Typography>
             }
             secondary={
                 <Stack direction="row" spacing={2} alignItems="center">
                     {addButton && (
-                        <Button color="primary" variant="contained" onClick={addButton}>
+                        <Button
+                            variant="contained"
+                            onClick={addButton}
+                            sx={{
+                                fontWeight: 'bold',
+                                textTransform: 'none',
+                                background: 'linear-gradient(to right,#4facfe,#4facfe)',
+                                color: 'white',
+                                '&:hover': {
+                                    background: 'linear-gradient(to right, #4facfe, #4facfe)'
+                                }
+                            }}
+                        >
                             Add
                         </Button>
                     )}
                 </Stack>
             }
         >
-            <CardContent>
+            <CardContent sx={{ p: 2, borderBottom: '2px solid #f0f0f0' }}>
                 <Grid container justifyContent="space-between" alignItems="center" spacing={2}>
-                    <Grid item xs={12} sm={6}>
+                    <Grid item xs={3}>
                         <TextField
+                            placeholder="Search"
+                            value={search}
+                            onChange={handleSearch}
+                            size="small"
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <SearchIcon fontSize="small" />
+                                        <SearchIcon fontSize="small" sx={{ color: '#4facfe' }} />
                                     </InputAdornment>
                                 )
                             }}
-                            onChange={handleSearch}
-                            placeholder="Search"
-                            value={search}
-                            size="small"
+                            sx={{
+                                width: '100%',
+                                backgroundColor: '#f5f7ff',
+                                borderRadius: 2,
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: 2,
+                                    '& fieldset': { border: '1px solid #ddd' },
+                                    '&:hover fieldset': { borderColor: '#4facfe' },
+                                    '&.Mui-focused fieldset': { borderColor: '#4facfe' }
+                                }
+                            }}
                         />
                     </Grid>
                 </Grid>
             </CardContent>
-            <TableContainer component={Paper} sx={{ maxHeight: 700 }}>
-                <Table stickyHeader sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
+
+            <TableContainer
+                component={Paper}
+                sx={{
+                    maxHeight: 700,
+                    borderRadius: 0,
+                    borderTop: '2px solid #f0f0f0'
+                }}
+            >
+                <Table stickyHeader sx={{ minWidth: 750 }}>
                     <EnhancedTableHead
                         numSelected={selected.length}
                         order={order}
@@ -300,62 +347,75 @@ const EnhancedDataTable = ({ data, headers, tableTitle, addButton, actions }) =>
                         rowCount={rows.length}
                         selected={selected}
                     />
+
                     <TableBody>
                         {rows.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={headers.length + 1} align="center">
-                                    <Typography variant="subtitle1">NO DATA AVAILABLE IN TABLE</Typography>
+                                <TableCell colSpan={headers.length + 1} align="center" sx={{ py: 3 }}>
+                                    <Typography variant="subtitle1" color="text.secondary">
+                                        No data available
+                                    </Typography>
                                 </TableCell>
                             </TableRow>
                         ) : (
                             stableSort(rows, getComparator(order, orderBy))
                                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                .map((row, index) => {
-                                    // const isItemSelected = isSelected(row?._id);
-                                    // const labelId = `enhanced-table-checkbox-${index}`;
-                                    return (
-                                        <TableRow hover role="checkbox" tabIndex={-1} key={index}>
-                                            {/* <TableCell
-                                                padding="checkbox"
-                                                sx={{ pl: 3, padding: '3px' }}
-                                                onClick={(event) => handleClick(event, row._id)}
-                                                align="center"
+                                .map((row, index) => (
+                                    <TableRow
+                                        hover
+                                        role="checkbox"
+                                        tabIndex={-1}
+                                        key={index}
+                                        sx={{
+                                            backgroundColor: index % 2 === 0 ? '#f0f9ff' : '#ffffff',
+                                            '&:hover': {
+                                                backgroundColor: 'rgba(79, 172, 254, 0.2)',
+                                                cursor: 'pointer'
+                                            },
+                                            transition: 'background-color 0.3s ease'
+                                        }}
+                                    >
+                                        {headers.map((header) => (
+                                            <TableCell
+                                                key={header.id}
+                                                align={header.align}
+                                                sx={{
+                                                    padding: '10px 16px',
+                                                    fontSize: '0.875rem',
+                                                    fontWeight: 500,
+                                                    color: header.id === 'jobNumber' ? '#ff4b2b' : 'text.primary',
+                                                    whiteSpace: 'nowrap'
+                                                }}
                                             >
-                                                <Checkbox
-                                                    color="primary"
-                                                    checked={isItemSelected}
-                                                    inputProps={{
-                                                        'aria-labelledby': labelId
-                                                    }}
-                                                />
-                                            </TableCell> */}
-                                            {headers.map((header) => (
-                                                <TableCell key={header.id} align={header.align} sx={{ padding: '4px' }}>
-                                                    <Typography
-                                                        variant="subtitle1"
-                                                        color={header.id === 'jobNumber' ? 'secondary' : 'inherit'}
-                                                    >
-                                                        {row[header.id]}
-                                                    </Typography>
-                                                </TableCell>
-                                            ))}
-                                            <TableCell align="center" sx={{ padding: '4px' }}>
-                                                {actions &&
-                                                    actions.map((action, index) => (
-                                                        <Tooltip key={index} title={action.title}>
-                                                            <Button key={index} onClick={() => action.handler(row)}>
-                                                                {action.icon}
-                                                            </Button>
-                                                        </Tooltip>
-                                                    ))}
+                                                {row[header.id]}
                                             </TableCell>
-                                        </TableRow>
-                                    );
-                                })
+                                        ))}
+                                        <TableCell align="center" sx={{ padding: '10px 16px' }}>
+                                            {actions?.map((action, actionIndex) => (
+                                                <Tooltip key={actionIndex} title={action.title}>
+                                                    <Button
+                                                        onClick={() => action.handler(row)}
+                                                        sx={{
+                                                            minWidth: 32,
+                                                            color: actionIndex % 2 === 0 ? '#ff4b2b' : '#4facfe',
+                                                            '&:hover': {
+                                                                backgroundColor: 'transparent',
+                                                                color: actionIndex % 2 === 0 ? '#d50000' : '#1976d2'
+                                                            }
+                                                        }}
+                                                    >
+                                                        {action.icon}
+                                                    </Button>
+                                                </Tooltip>
+                                            ))}
+                                        </TableCell>
+                                    </TableRow>
+                                ))
                         )}
                     </TableBody>
                 </Table>
             </TableContainer>
+
             <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
                 component="div"
@@ -364,9 +424,20 @@ const EnhancedDataTable = ({ data, headers, tableTitle, addButton, actions }) =>
                 page={page}
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
+                sx={{
+                    borderTop: '2px solid #f0f0f0',
+                    '& .MuiTablePagination-toolbar': {
+                        px: 2,
+                        py: 1,
+                        fontSize: '0.875rem'
+                    },
+                    '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                        fontSize: '0.875rem'
+                    }
+                }}
             />
         </MainCard>
     );
 };
 
-export default EnhancedDataTable;
+export default CustomDataTable;
