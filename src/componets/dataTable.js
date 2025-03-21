@@ -8,6 +8,7 @@ import {
     InputAdornment,
     Paper,
     Stack,
+    Switch,
     Table,
     TableBody,
     TableCell,
@@ -28,13 +29,14 @@ import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 
 // icon
+import CachedIcon from '@mui/icons-material/Cached';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 
 // custom component
 import MainCard from './cards/MainCard';
 
-const CustomDataTable = ({ data, headers, tableTitle, addButton, actions, color }) => {
+const CustomDataTable = ({ data, headers, tableTitle, addButton, actions, color, refresh }) => {
     const [rows, setRows] = useState(data);
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState(headers?.[0]?.id);
@@ -283,6 +285,13 @@ const CustomDataTable = ({ data, headers, tableTitle, addButton, actions, color 
             }
             secondary={
                 <Stack direction="row" spacing={2} alignItems="center">
+                    {refresh && (
+                        <Tooltip title="Refresh Data">
+                            <IconButton color="secondary" size="small" aria-label="view" onClick={refresh}>
+                                <CachedIcon style={{ cursor: 'pointer' }} />
+                            </IconButton>
+                        </Tooltip>
+                    )}
                     {addButton && (
                         <Button
                             variant="contained"
@@ -393,30 +402,41 @@ const CustomDataTable = ({ data, headers, tableTitle, addButton, actions, color 
                                                 }}
                                             >
                                                 {header.id === 'status' ? (
-                                                    <Chip label={row[header.id]} color={header.color} />
+                                                    <Chip label={row[header.id]} color={header.color?.[row[header.id]] || 'default'} />
                                                 ) : (
                                                     row[header.id]
                                                 )}
                                             </TableCell>
                                         ))}
                                         <TableCell align="center" sx={{ padding: '10px 16px' }}>
-                                            {actions?.map((action, actionIndex) => (
-                                                <Tooltip key={actionIndex} title={action.title}>
-                                                    <Button
-                                                        onClick={() => action.handler(row)}
-                                                        sx={{
-                                                            minWidth: 32,
-                                                            color: action.color,
-                                                            '&:hover': {
-                                                                backgroundColor: 'transparent',
-                                                                color: action.color
-                                                            }
-                                                        }}
-                                                    >
-                                                        {action.icon}
-                                                    </Button>
-                                                </Tooltip>
-                                            ))}
+                                            <Stack direction="row" alignItems="center">
+                                                {actions?.map((action, actionIndex) => (
+                                                    <Tooltip key={actionIndex} title={action.title}>
+                                                        {action.property && action.isSwitch ? (
+                                                            <Switch
+                                                                checked={row[action.property]}
+                                                                onChange={() => action.handler(row)}
+                                                                size="small"
+                                                            />
+                                                        ) : (
+                                                            <Button
+                                                                onClick={() => action.handler(row)}
+                                                                size="small"
+                                                                sx={{
+                                                                    minWidth: 32,
+                                                                    color: action.color,
+                                                                    '&:hover': {
+                                                                        backgroundColor: 'transparent',
+                                                                        color: action.color
+                                                                    }
+                                                                }}
+                                                            >
+                                                                {action.icon}
+                                                            </Button>
+                                                        )}
+                                                    </Tooltip>
+                                                ))}
+                                            </Stack>
                                         </TableCell>
                                     </TableRow>
                                 ))
