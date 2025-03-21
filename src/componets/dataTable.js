@@ -2,6 +2,7 @@ import {
     Box,
     Button,
     CardContent,
+    Chip,
     Grid,
     IconButton,
     InputAdornment,
@@ -33,7 +34,7 @@ import SearchIcon from '@mui/icons-material/Search';
 // custom component
 import MainCard from './cards/MainCard';
 
-const CustomDataTable = ({ data, headers, tableTitle, addButton, actions }) => {
+const CustomDataTable = ({ data, headers, tableTitle, addButton, actions, color }) => {
     const [rows, setRows] = useState(data);
     const [order, setOrder] = useState('asc');
     const [orderBy, setOrderBy] = useState(headers?.[0]?.id);
@@ -252,6 +253,10 @@ const CustomDataTable = ({ data, headers, tableTitle, addButton, actions }) => {
         setSearchKeys(searchKeys);
     }, [headers]);
 
+    React.useEffect(() => {
+        setRows(data);
+    }, [data]);
+
     return (
         <MainCard
             border
@@ -263,14 +268,14 @@ const CustomDataTable = ({ data, headers, tableTitle, addButton, actions }) => {
             }}
             title={
                 <Typography
-                    variant="h5"
+                    variant="h3"
                     sx={{
                         fontWeight: 'bold',
                         letterSpacing: '0.75px',
                         textTransform: 'capitalize',
-                        background: 'linear-gradient(to right, #4facfe, #00f2fe)',
+                        background: { color },
                         WebkitBackgroundClip: 'text',
-                        color: 'transparent'
+                        color: { color }
                     }}
                 >
                     {tableTitle}
@@ -285,10 +290,10 @@ const CustomDataTable = ({ data, headers, tableTitle, addButton, actions }) => {
                             sx={{
                                 fontWeight: 'bold',
                                 textTransform: 'none',
-                                background: 'linear-gradient(to right,#4facfe,#4facfe)',
+                                background: { color },
                                 color: 'white',
                                 '&:hover': {
-                                    background: 'linear-gradient(to right, #4facfe, #4facfe)'
+                                    background: { color }
                                 }
                             }}
                         >
@@ -309,7 +314,7 @@ const CustomDataTable = ({ data, headers, tableTitle, addButton, actions }) => {
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                        <SearchIcon fontSize="small" sx={{ color: '#4facfe' }} />
+                                        <SearchIcon fontSize="small" sx={{ color: { color } }} />
                                     </InputAdornment>
                                 )
                             }}
@@ -320,8 +325,8 @@ const CustomDataTable = ({ data, headers, tableTitle, addButton, actions }) => {
                                 '& .MuiOutlinedInput-root': {
                                     borderRadius: 2,
                                     '& fieldset': { border: '1px solid #ddd' },
-                                    '&:hover fieldset': { borderColor: '#4facfe' },
-                                    '&.Mui-focused fieldset': { borderColor: '#4facfe' }
+                                    '&:hover fieldset': { borderColor: { color } },
+                                    '&.Mui-focused fieldset': { borderColor: { color } }
                                 }
                             }}
                         />
@@ -387,7 +392,11 @@ const CustomDataTable = ({ data, headers, tableTitle, addButton, actions }) => {
                                                     whiteSpace: 'nowrap'
                                                 }}
                                             >
-                                                {row[header.id]}
+                                                {header.id === 'status' ? (
+                                                    <Chip label={row[header.id]} color={header.color} />
+                                                ) : (
+                                                    row[header.id]
+                                                )}
                                             </TableCell>
                                         ))}
                                         <TableCell align="center" sx={{ padding: '10px 16px' }}>
@@ -397,10 +406,10 @@ const CustomDataTable = ({ data, headers, tableTitle, addButton, actions }) => {
                                                         onClick={() => action.handler(row)}
                                                         sx={{
                                                             minWidth: 32,
-                                                            color: actionIndex % 2 === 0 ? '#ff4b2b' : '#4facfe',
+                                                            color: action.color,
                                                             '&:hover': {
                                                                 backgroundColor: 'transparent',
-                                                                color: actionIndex % 2 === 0 ? '#d50000' : '#1976d2'
+                                                                color: action.color
                                                             }
                                                         }}
                                                     >
@@ -441,3 +450,20 @@ const CustomDataTable = ({ data, headers, tableTitle, addButton, actions }) => {
 };
 
 export default CustomDataTable;
+
+const dummyData = [
+    { id: 1, name: 'John Doe', age: 28, email: 'john@example.com' },
+    { id: 2, name: 'Jane Smith', age: 34, email: 'jane@example.com' },
+    { id: 3, name: 'Alice Johnson', age: 24, email: 'alice@example.com' }
+];
+
+const headers = [
+    { id: 'name', label: 'Name', align: 'left' },
+    { id: 'age', label: 'Age', align: 'right' },
+    { id: 'email', label: 'Email', align: 'left' }
+];
+
+const actions = [
+    // { title: 'Edit', icon: <EditTwoToneIcon />, handler: (row) => console.log('Edit', row) },
+    // { title: 'Delete', icon: <DeleteIcon />, handler: (row) => console.log('Delete', row) }
+];
