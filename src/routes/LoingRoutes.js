@@ -4,19 +4,28 @@ import { lazy } from 'react';
 import Loadable from '../componets/Loadable';
 import GuestGuard from '../guard/guestGuard';
 
+// pages
 const LogIn = Loadable(lazy(() => import('../view/login')));
+const PhoneNumberLogin = Loadable(lazy(() => import('../view/login/PhoneNumberLogin')));
 
 const LogInRoutes = {
     path: '/',
-    element: (
-        <GuestGuard>
-            <LogIn />
-        </GuestGuard>
-    ),
     children: [
         {
             path: '/',
-            element: <LogIn /> // SUPER ADMIN
+            element: (
+                <GuestGuard>
+                    <LogIn />
+                </GuestGuard>
+            )
+        },
+        {
+            path: '/phone-login',
+            element: (
+                <GuestGuard>
+                    <PhoneNumberLogin />
+                </GuestGuard>
+            )
         }
     ]
 };

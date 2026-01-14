@@ -1,3 +1,9 @@
 export const gridSpacing = 2;
 export const drawerWidth = 260;
 export const appDrawerWidth = 320;
+export const ADMIN_URL = ['/user'];
+export const fontFamily = 'Copperplate, Fantasy';
+export const roles = ['DRIVER', 'SUPER_VISOR', 'PHARMACIST'];
+export const ADMIN = 'ADMIN';
+export const CLIENT = 'CLIENT';
+export const USER = 'USER';

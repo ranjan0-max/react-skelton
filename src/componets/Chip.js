@@ -1,13 +1,12 @@
 import PropTypes from 'prop-types';
 
 // material-ui
-import { useTheme } from '@mui/material/styles';
-import MuiChip from '@mui/material/Chip';
+import theme from '../componets/Theme';
+import { Tag } from 'rsuite';
 
 // ==============================|| CHIP ||============================== //
 
 const Chip = ({ chipcolor, disabled, sx = {}, variant, ...others }) => {
-    const theme = useTheme();
 
     let defaultSX = {
         color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.main,
@@ -171,7 +170,7 @@ const Chip = ({ chipcolor, disabled, sx = {}, variant, ...others }) => {
         SX = outlineSX;
     }
     SX = { ...SX, ...sx };
-    return <MuiChip {...others} sx={SX} />;
+    return <Tag {...others} style={SX} />;
 };
 
 Chip.propTypes = {

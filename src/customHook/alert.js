@@ -1,35 +1,44 @@
-import React, { useState } from 'react';
-// import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
+import { Notification, toaster } from 'rsuite';
 
 const useSnackbarAlert = () => {
-    const [open, setOpen] = useState(false);
-    const [severity, setSeverity] = useState('success'); // Default severity
-    const [message, setMessage] = useState('');
-    const [anchorOrigin, setAnchorOrigin] = useState({ vertical: 'top', horizontal: 'right' });
 
-    const handleOpen = (msg, severity = 'success', position = { vertical: 'top', horizontal: 'right' }) => {
-        setMessage(msg);
-        setSeverity(severity);
-        setAnchorOrigin(position);
-        setOpen(true);
+    const getRsuiteType = (severityType) => {
+        const typeMap = {
+            success: 'success',
+            error: 'error',
+            warning: 'warning',
+            info: 'info'
+        };
+        return typeMap[severityType] || 'info';
     };
 
-    const handleClose = () => {
-        setOpen(false);
+    const openTostar = (msg, severityType = 'success') => {
+        toaster.push(
+            <Notification
+                type={getRsuiteType(severityType)}
+                closable
+                header={severityType.toUpperCase()}
+            >
+                {msg}
+            </Notification>,
+            {
+                placement: 'bottomEnd',
+                duration: 3000,
+            }
+        );
     };
 
-    const SnackbarComponent = () => (
-        <Snackbar open={open} autoHideDuration={1000} anchorOrigin={anchorOrigin} onClose={handleClose}>
-            <Alert onClose={handleClose} severity={severity} variant="filled" sx={{ width: '100%' }}>
-                {message}
-            </Alert>
-        </Snackbar>
-    );
+    const closeTostar = () => {
+        toaster.clear();
+    };
 
-    return { handleOpen, handleClose, SnackbarComponent };
+    const SnackbarComponent = () => null;
+
+    return {
+        openTostar,
+        closeTostar,
+        SnackbarComponent
+    };
 };
 
 export default useSnackbarAlert;

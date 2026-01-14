@@ -1,13 +1,14 @@
-import { useState, useEffect, lazy, useContext } from 'react';
-import Loadable from 'ui-component/Loadable';
-import { AccessableUrlsContext } from 'contexts/accessableRouteContext';
+import Loadable from 'componets/Loadable';
+import { lazy, useEffect, useState } from 'react';
+import useAuth from '../customHook/useAuth';
 
-const MaintenanceError = Loadable(lazy(() => import('views/pages/maintenance/Error')));
+const MaintenanceError = Loadable(lazy(() => import('../componets/Error')));
 
 function RouteGard(props) {
-    const { accessableUrls } = useContext(AccessableUrlsContext);
-    const [show, setShow] = useState(true);
     const { Component, url } = props;
+    const { accessableUrls } = useAuth();
+
+    const [show, setShow] = useState(true);
 
     const checkAccess = () => {
         if (accessableUrls.includes(url)) {
@@ -20,6 +21,7 @@ function RouteGard(props) {
     useEffect(() => {
         checkAccess();
     }, [url, accessableUrls]);
+
     return show ? <Component /> : <MaintenanceError />;
 }
 

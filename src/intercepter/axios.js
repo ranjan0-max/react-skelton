@@ -5,7 +5,7 @@
 import axios from 'axios';
 // 'http://127.0.0.1:9081/v1/'
 const axiosServices = axios.create({
-    baseURL: 'http://127.0.0.1:1234/v1/',
+    baseURL: process.env.REACT_APP_BACKEND_SERVER || 'https://sworkcheck.coderootz.com/api/v1',
     withCredentials: true
 });
 
@@ -20,6 +20,13 @@ let isRefreshing = false;
 axiosServices.interceptors.response.use(
     (response) => response,
     async (error) => {
+        if (error?.response?.status === 403) {
+            localStorage.removeItem('accessToken');
+            localStorage.setItem('clientInactive', 'true');
+            delete axios.defaults.headers.common.Authorization;
+            window.location.href = '/';
+        }
+
         const originalRequest = error.config;
         if (error.response.headers['x-server-errortype'] === 'AccessTokenExpired' && !originalRequest.retry) {
             // Check if a refresh is already in progress
@@ -44,7 +51,7 @@ axiosServices.interceptors.response.use(
             }
         }
 
-        return Promise.reject((error.response && error.response.data) || 'Wrong Services ~-> Server Not Started');
+        return Promise.reject((error.response && error.response) || 'Wrong Services ~-> Server Not Started');
     }
 );
 export default axiosServices;

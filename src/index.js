@@ -1,11 +1,12 @@
 // index.js
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { AuthProvider } from './contextApi/userAuth';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
-import { AuthProvider } from './contextApi/userAuth';
-import { BrowserRouter as Router } from 'react-router-dom';
 import Routes from './routes';
+import 'rsuite/dist/rsuite.min.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
