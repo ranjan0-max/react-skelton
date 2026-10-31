@@ -1,10 +1,14 @@
-const theme = {
+import { createTheme } from '@mui/material/styles';
+
+//? real MUI theme -> used by ThemeProvider (index.jsx) and directly as theme.palette.primary.main etc.
+//? custom keys (customBackground, primaryTextColor...) are kept by createTheme
+const theme = createTheme({
     palette: {
         primary: {
             main: '#8F89EA'
         },
         secondary: {
-            main: '#8983d6ff'
+            main: '#8983d6'
         },
         background: {
             default: 'white'
@@ -31,6 +35,6 @@ const theme = {
             color: '#8F89EA'
         }
     }
-};
+});
 
 export default theme;

@@ -10,7 +10,7 @@ const initialState = {
     },
     variant: 'default',
     alert: {
-        color: 'primary',
+        color: 'info', // success | error | warning | info (MUI Alert severity)
         variant: 'filled'
     },
     transition: 'Fade',
